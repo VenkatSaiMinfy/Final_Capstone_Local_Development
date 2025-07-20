@@ -105,7 +105,7 @@
 ```text
 - OS: WSL (Ubuntu) or native Ubuntu system
 - Environment: Conda environment (example name: `lead_pipeline_env`)
-- Python: Version 3.8 installed
+- Python: Version 3.10 installed
 - Project Directory: (example) `~/Projects/lead_pipeline_project/src/airflow/`
 ```
 
