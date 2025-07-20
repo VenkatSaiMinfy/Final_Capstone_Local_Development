@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Lead Scoring - Animated Prediction UI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Animate.css for smooth effects -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(120deg, #8fd6fc 0%, #e0c3fc 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.2);
+      backdrop-filter: blur(7px);
+      padding: 40px 30px 32px 30px;
+      max-width: 870px;
+      width: 98vw;
+      margin: 32px auto;
+      position: relative;
+    }
+    .upload-area {
+      border: 2px dashed #1782fa;
+      padding: 30px;
+      border-radius: 12px;
+      background: rgba(23,130,250,0.06);
+      text-align: center;
+      transition: border-color 0.3s, box-shadow 0.2s;
+      margin-bottom: 22px;
+      cursor: pointer;
+    }
+    .upload-area.dragover {
+      border-color: #ff60a9;
+      background: rgba(255,96,169,0.09);
+      box-shadow: 0 0 16px #ff60a980;
+    }
+    .upload-area i {
+      font-size: 2rem;
+      color: #1782fa;
+      margin-bottom: 8px;
+    }
+    .animated-table {
+      animation: fadeInUp 0.8s;
+      --animate-duration: 1s;
+    }
+    .table th, .table td {
+      vertical-align: middle;
+      transition: background 0.1s;
+    }
+    .table tbody tr {
+      transition: box-shadow 0.2s, background 0.1s;
+    }
+    .table tbody tr:hover {
+      background: rgba(23,130,250,0.06)!important;
+      box-shadow: 0 4px 24px #94d4fa42;
+      z-index: 1;
+      position: relative;
+    }
+    .spinner-border {
+      width: 2.7rem;
+      height: 2.7rem;
+      border-width: 0.4em;
+      color: #ff60a9;
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 28px;
+      z-index: 1030;
+      min-width: 200px;
+      --bs-toast-bg: #f5fafd;
+      --bs-toast-border-color: #aee0fe;
+      --bs-toast-color: #0064b9;
+    }
+    @media (max-width: 700px) {
+      .glass-card { padding: 18px 4vw!important; }
+      .upload-area { padding: 18px;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Toasts -->
+  <div class="toast align-items-center d-none" id="main-toast" role="alert">
+    <div class="d-flex">
+      <div class="toast-body fw-medium"></div>
+      <button type="button" class="btn-close ms-2 me-1" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <div class="glass-card shadow-lg animate__animated animate__fadeIn">
+    <h2 class="mb-4 text-gradient text-center animate__fadeInDown animate__delay-1s animate__animated">
+      <i class="fa-solid fa-star-half-stroke"></i> Lead Scoring Prediction
+    </h2>
+
+    <!-- Animated upload area -->
+    <div class="upload-area" id="upload-area">
+      <i class="fa fa-cloud-upload-alt"></i>
+      <div class="mb-2 fs-6 fw-semibold">
+        Drag &amp; drop your CSV or <label for="file" class="link-primary" style="cursor:pointer;">Browse</label>
+      </div>
+      <input class="form-control d-none" type="file" name="file" id="file" accept=".csv">
+    </div>
+    <button id="predict-btn" class="btn btn-primary w-100 fw-bold py-2">
+      <span><i class="fa fa-magic"></i> Predict</span>
+    </button>
+
+    <div id="loading" style="display:none;" class="text-center my-4 animate__flash animate__infinite">
+      <div class="spinner-border text-primary" role="status"></div>
+      <div class="fw-semibold mt-2 animate__animated animate__pulse animate__slower animate__infinite">Processing...</div>
+    </div>
+
+    <div id="result-section" class="result-box mt-4 animate__animated" style="display:none;">
+      <h5 class="mb-3 text-success"><i class="fa fa-list-ul"></i> Prediction Results</h5>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover animated-table" id="prediction-table">
+          <thead class="table-primary">
+            <tr id="table-headers"></tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS & Popper (for toasts) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // UI Elements
+    const uploadArea = document.getElementById('upload-area');
+    const inputFile = document.getElementById('file');
+    const predictBtn = document.getElementById('predict-btn');
+    const loadingSpinner = document.getElementById('loading');
+    const resultSection = document.getElementById('result-section');
+    const tableHeaders = document.getElementById("table-headers");
+    const tableBody = document.getElementById("table-body");
+    const toastElem = document.getElementById('main-toast');
+    const toastBody = toastElem.querySelector('.toast-body');
+    let fileToUpload = null;
+
+    // ---- Toast Utility ----
+    function showToast(msg, type="info") {
+      toastElem.classList.remove('d-none');
+      toastBody.textContent = msg;
+      toastElem.classList.remove("text-success","text-danger","text-info");
+      if(type==="success") toastBody.classList.add("text-success");
+      else if(type==="danger") toastBody.classList.add("text-danger");
+      else toastBody.classList.add("text-info");
+      let bsToast = new bootstrap.Toast(toastElem, { delay:2500 });
+      bsToast.show();
+    }
+
+    // ---- Drag and Drop effects ----
+    uploadArea.addEventListener("dragover", function(e){
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener("dragleave", function(e){
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener("drop", function(e){
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        let file = e.dataTransfer.files[0];
+        if (!file.name.endsWith('.csv')) {
+          showToast("Please upload a CSV file.","danger");
+          return;
+        }
+        fileToUpload = file;
+        inputFile.files = e.dataTransfer.files;
+        uploadArea.querySelector('i').classList.replace('fa-cloud-upload-alt', 'fa-file-csv');
+        uploadArea.querySelector('.fs-6').textContent = file.name + " selected";
+        showToast(file.name + " ready!", "success");
+      }
+    });
+    // Click to browse
+    uploadArea.addEventListener("click", ()=> inputFile.click());
+    inputFile.addEventListener("change", function(){
+      if (!inputFile.files.length) return;
+      let file = inputFile.files[0];
+      if (!file.name.endsWith('.csv')) {
+        showToast("Please upload a CSV file.","danger");
+        inputFile.value = ""; fileToUpload=null;
+        return;
+      }
+      fileToUpload = file;
+      uploadArea.querySelector('i').classList.replace('fa-cloud-upload-alt', 'fa-file-csv');
+      uploadArea.querySelector('.fs-6').textContent = file.name + " selected";
+      showToast(file.name + " ready!","success");
+    });
+
+    // ---- Predict Button ----
+    predictBtn.addEventListener("click", async function(){
+      if(!fileToUpload) {
+        showToast("Please select a CSV file before predicting.","danger");
+        return;
+      }
+      // Start loading
+      loadingSpinner.style.display = "block";
+      predictBtn.disabled = true;
+      resultSection.style.display = "none";
+
+      // Prepare form
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+
+      try {
+        // ---- Make POST to your /upload endpoint ----
+        const response = await fetch("/upload", { method: "POST", body: formData });
+        if (!response.ok) throw new Error("Request failed.");
+        const json = await response.json();
+        const predictions = json.predictions;
+
+        // Animate table
+        tableHeaders.innerHTML = ""; tableBody.innerHTML = "";
+        if (!predictions || predictions.length === 0) {
+          tableBody.innerHTML = "<tr><td class='text-muted'>No data returned.</td></tr>";
+        } else {
+          // Headers
+          Object.keys(predictions[0]).forEach(col => {
+            const th = document.createElement("th");
+            th.textContent = col;
+            th.classList.add('animate__animated','animate__fadeInDown');
+            tableHeaders.appendChild(th);
+          });
+          // Rows
+          predictions.forEach((row, idx) => {
+            const tr = document.createElement("tr");
+            tr.style.animationDelay = (idx*60) + "ms";
+            Object.values(row).forEach(val => {
+              const td = document.createElement("td");
+              td.textContent = val===null ? "" : val;
+              tr.appendChild(td);
+            });
+            tr.classList.add('animate__animated','animate__fadeInUp');
+            tableBody.appendChild(tr);
+          });
+        }
+        loadingSpinner.style.display = "none";
+        resultSection.style.display = "block";
+        resultSection.classList.add("animate__fadeIn");
+        showToast("Predictions loaded!","success");
+      } catch (err) {
+        loadingSpinner.style.display = "none";
+        showToast("Error uploading or predicting. Try again.","danger");
+        resultSection.style.display = "none";
+        console.error(err);
+      } finally {
+        predictBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+import os
+import sys
+import pandas as pd
+import numpy as np
+import mlflow.sklearn
+from typing import Union, List
+
+# ─────────────────────────────────────────────
+# Set project root for module imports if needed
+# ─────────────────────────────────────────────
+here = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(here, "../../../"))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from src.ml.data_loader.data_loader import save_dataframe_to_postgres  # ⬅️ Import saving utility
+
+# ─────────────────────────────────────────────
+# Constants: Model Registry Names and Stage
+# ─────────────────────────────────────────────
+PREPROCESSOR_NAME = "LeadScoringPreprocessor"
+MODEL_NAME = "LeadScoringBestModel"
+STAGE = "Production"
+
+# ─────────────────────────────────────────────
+# Load Preprocessor Pipeline & Model
+# ─────────────────────────────────────────────
+try:
+    # This pipeline includes feature_eng → preprocessing → feature_selection
+    preprocessor_uri = f"models:/{PREPROCESSOR_NAME}/{STAGE}"
+    preprocessor = mlflow.sklearn.load_model(preprocessor_uri)
+
+    # This is just the trained classifier for predict_proba
+    model_uri = f"models:/{MODEL_NAME}/{STAGE}"
+    model = mlflow.sklearn.load_model(model_uri)
+
+    print(f"✅ Loaded preprocessor and model from MLflow registry (stage={STAGE})")
+except Exception as e:
+    raise RuntimeError(f"❌ Failed to load model or preprocessor: {e}")
+
+
+# ─────────────────────────────────────────────
+# Single-lead prediction
+# ─────────────────────────────────────────────
+def predict_lead(input_dict: dict) -> Union[float, dict]:
+    try:
+        df = pd.DataFrame([input_dict])
+        X_proc = preprocessor.transform(df)
+        raw = model.predict_proba(X_proc)
+
+        arr = np.asarray(raw)
+        # Handle 1D or 2D outputs
+        if arr.ndim == 1:
+            return float(arr[0])
+        if arr.ndim == 2 and arr.shape[1] >= 2:
+            return float(arr[0, 1])
+        if arr.ndim == 2 and arr.shape[1] == 1:
+            return float(arr[0, 0])
+
+        return {"error": f"Unexpected output shape: {arr.shape}"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# ─────────────────────────────────────────────
+# Batch prediction
+# ─────────────────────────────────────────────
+def predict_batch(df: pd.DataFrame, save: bool = True) -> Union[List[int], dict]:
+    try:
+        # 1) transform input
+        X_proc = preprocessor.transform(df)  # shape: (n_rows, 50)
+
+        if save:
+            # 2) get the 192 full names from the preprocessing step
+            preprocessing = preprocessor.named_steps["preprocessing"]
+            base_names = preprocessing.get_feature_names_out()
+
+            # 3) get the indices your FeatureSelector chose
+            selector = preprocessor.named_steps["feature_selection"]
+            selected_idxs = selector.selected_features  # array of 50 ints
+
+            # 4) map those into final names
+            feature_names = [base_names[i] for i in selected_idxs]
+
+            # 5) sanity check
+            assert len(feature_names) == X_proc.shape[1], (
+                f"Expected {X_proc.shape[1]} feature names but got {len(feature_names)}"
+            )
+
+            # 6) build DataFrame with the right columns
+            df_pre = pd.DataFrame(X_proc, columns=feature_names)
+
+            save_dataframe_to_postgres(
+                df_pre,
+                table_name="user_uploaded_preprocessed",
+                if_exists="append"
+            )
+            print(f"✅ Preprocessed features saved to 'user_uploaded_preprocessed' with columns: {feature_names}")
+
+        # 7) predict
+        raw = model.predict_proba(X_proc)
+        arr = np.asarray(raw)
+        if arr.ndim == 1:
+            preds = [int(x > 0.5) for x in arr]
+        else:
+            preds = [int(x > 0.5) for x in arr[:, 1]]
+
+        return preds
+
+    except Exception as e:
+        print("❌ [ERROR] in predict_batch:", e)
+        return {"error": str(e)}
+
+
+# ─────────────────────────────────────────────
+# (Optional) Debug test when run directly
+# ─────────────────────────────────────────────
+if __name__ == "__main__":
+    # Create a dummy row with the exact columns your preprocess pipeline expects
+    sample = {col: 0 for col in preprocessor.feature_names_in_}  # fill zeros
+    print("Single:", predict_lead(sample))
+
+    df = pd.DataFrame([sample, sample])
+    print("Batch:", predict_batch(df))
