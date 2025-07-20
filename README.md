@@ -1,79 +1,71 @@
-## ✅ Prerequisites
+## 🧰 Installation Prerequisites
 ```text
-- WSL (Ubuntu) or native Ubuntu system
-- Conda environment named `lead_scoring_system`
-- Python 3.8 installed and active
-- Airflow project directory: `src/airflow/`
+- OS: WSL (Ubuntu) or native Ubuntu system
+- Environment: Conda environment named `lead_scoring_system`
+- Language: Python 3.8 installed
+- Project Directory: `src/airflow/`
 ```
 
-## 📦 Step 1: Install PostgreSQL
+## 📦 Step 1 – Install PostgreSQL
 ```text
 sudo apt update
 sudo apt install postgresql postgresql-contrib
 ```
 
-## 🛢️ Step 2: Setup PostgreSQL Database
+## 🛠️ Step 2 – Configure PostgreSQL
 ```text
-# Create a new database
+# Create the database
 sudo -u postgres psql -c "CREATE DATABASE lead_scoring_db;"
 
-# (Optional) Access PostgreSQL CLI
+# (Optional) Enter PostgreSQL CLI
 sudo -u postgres psql
 ```
 
-## 📋 PostgreSQL CLI Commands (Optional)
+## 🧪 Step 3 – Validate DB inside CLI (Optional)
 ```text
 \l                             # List all databases
 \c lead_scoring_db            # Connect to the new DB
 select * from lead_data_uploaded limit 10;  # Preview table data
 ```
 
-## 🐍 Step 3: Install Airflow 2.10.0 in Conda Environment
+## 🐍 Step 4 – Install Airflow in Conda
 ```text
-# Make sure your Conda environment is activated
 conda activate lead_scoring_system
 
-# Install Airflow with Python 3.8 compatible constraints
 pip install "apache-airflow==2.10.0" \
   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.0/constraints-3.8.txt"
 ```
 
-## 🏠 Step 4: Set AIRFLOW_HOME in Shell Config
+## 🏗️ Step 5 – Configure Shell Environment
 ```text
-# Open your shell configuration file
 nano ~/.bashrc        # For bash users
 # OR
 nano ~/.zshrc         # For zsh users
 
-# Add the following lines at the bottom
+# Add to bottom of file:
 export AIRFLOW_HOME=~/Final_Capstone_Project/lead_scoring_project/src/airflow
 conda activate lead_scoring_system
 
-# Save and exit
+# Save and reload
 Ctrl + O → Enter → Ctrl + X
-
-# Reload your shell session
 source ~/.bashrc
 ```
 
-## 🔍 Step 5: Verify the Setup
+## 🔍 Step 6 – Check Configuration
 ```text
 echo $AIRFLOW_HOME
-# Expected: /home/venkat/Final_Capstone_Project/lead_scoring_project/src/airflow
-
 which airflow
-# Should point to: /home/venkat/miniconda3/envs/lead_scoring_system/bin/airflow
 
-# (Optional) Clean up the default Airflow directory
+# (Optional) Remove default Airflow folder
 rm -rf ~/airflow
 ```
 
-## 🛠️ Step 6: Initialize Airflow Metadata DB
+## 🗃️ Step 7 – Initialize Airflow Metadata DB
 ```text
 airflow db init
 ```
 
-## 👤 Step 7: Create Airflow Admin User
+## 👤 Step 8 – Create Admin User for Airflow
 ```text
 airflow users create \
     --username admin \
@@ -83,33 +75,32 @@ airflow users create \
     --email venkat@example.com
 ```
 
-## 🚀 Step 8: Start Airflow Services
+## 🚀 Step 9 – Start Airflow Services
 ```text
-# Terminal 1 – Webserver
+# Terminal 1
 airflow webserver --port 8080
 
-# Terminal 2 – Scheduler
+# Terminal 2
 airflow scheduler
 ```
 
-## 🌐 Access Airflow UI
+## 🌐 Step 10 – Access Web Interface
 ```text
-# Open your browser and visit:
-http://localhost:8080
+Visit: http://localhost:8080
 ```
 
-## 📁 Output Directory Structure (after initialization)
+## 📁 Project Output Structure
 ```text
 src/airflow/
 ├── airflow.cfg         # Main Airflow configuration
-├── airflow.db          # SQLite DB (for metadata)
-├── dags/               # Folder for DAG scripts
-└── logs/               # Log files for all tasks
+├── airflow.db          # Metadata SQLite database
+├── dags/               # DAG scripts go here
+└── logs/               # Execution logs
 ```
 
-## ✅ From Now On
+## ⚙️ Environment Behavior
 ```text
-- AIRFLOW_HOME is auto-set whenever terminal is opened
-- Conda env `lead_scoring_system` auto-activates (optional but useful)
-- All Airflow files (db, logs, config) are isolated inside `src/airflow/` for cleaner project management
+- AIRFLOW_HOME loads automatically on terminal open
+- Conda environment `lead_scoring_system` activates (if configured)
+- Project files remain organized in `src/airflow/`
 ```
