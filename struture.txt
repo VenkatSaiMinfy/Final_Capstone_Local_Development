@@ -1,0 +1,221 @@
+.
+├── Final_Outputs
+│   ├── AFTER DATA UPLOADED BY USER BACKEND( Step 12)
+│   │   ├── Screenshot 2025-07-20 104300.png
+│   │   └── Screenshot 2025-07-20 122109.png
+│   ├── Airflow (Step 13)
+│   │   ├── Screenshot 2025-07-19 232709.png
+│   │   ├── Screenshot 2025-07-20 100231.png
+│   │   └── Screenshot 2025-07-20 100353.png
+│   ├── CRAWLER(Step 5)
+│   │   ├── Screenshot 2025-07-17 235314.png
+│   │   ├── Screenshot 2025-07-17 235328.png
+│   │   ├── Screenshot 2025-07-17 235337.png
+│   │   └── Screenshot 2025-07-18 002832.png
+│   ├── Dirft logs (Step 14)
+│   │   ├── Screenshot 2025-07-20 100252.png
+│   │   └── Screenshot 2025-07-20 122618.png
+│   ├── EC2 (MLFLOW) [STEP 8]
+│   │   ├── Screenshot 2025-07-19 001255.png
+│   │   ├── Screenshot 2025-07-19 001306.png
+│   │   ├── Screenshot 2025-07-20 101734.png
+│   │   └── Screenshot 2025-07-20 122230.png
+│   ├── Final Flask Code (Step 13)
+│   │   ├── Screenshot 2025-07-20 121408.png
+│   │   └── Screenshot 2025-07-20 121419.png
+│   ├── Glue connections (Step 6)
+│   │   └── Screenshot 2025-07-17 235348.png
+│   ├── IAM
+│   │   └── Screenshot 2025-07-17 235506.png
+│   ├── Inital S3 with Lead  Data(Step 1)
+│   │   └── Screenshot 2025-07-17 235451.png
+│   ├── MLflow (Step 10)
+│   │   ├── Screenshot 2025-07-19 083038.png
+│   │   ├── Screenshot 2025-07-19 083052.png
+│   │   ├── Screenshot 2025-07-19 083117.png
+│   │   ├── Screenshot 2025-07-19 083140.png
+│   │   ├── Screenshot 2025-07-19 083203.png
+│   │   ├── Screenshot 2025-07-19 083216.png
+│   │   ├── Screenshot 2025-07-19 083240.png
+│   │   ├── Screenshot 2025-07-19 083251.png
+│   │   ├── Screenshot 2025-07-19 083304.png
+│   │   └── Screenshot 2025-07-19 083316.png
+│   ├── REDSHIFT (Step 4)
+│   │   ├── Screenshot 2025-07-17 235359.png
+│   │   └── Screenshot 2025-07-17 235407.png
+│   ├── S3 - REDSHIFT (Step 7)
+│   │   ├── Screenshot 2025-07-18 002945.png
+│   │   ├── Screenshot 2025-07-18 002958.png
+│   │   └── Screenshot 2025-07-18 003024.png
+│   ├── S3 Buckets Final State with all files(Step 15)
+│   │   ├── Screenshot 2025-07-18 003635.png
+│   │   ├── Screenshot 2025-07-18 003646.png
+│   │   ├── Screenshot 2025-07-18 003656.png
+│   │   ├── Screenshot 2025-07-18 003707.png
+│   │   ├── Screenshot 2025-07-19 091313.png
+│   │   ├── Screenshot 2025-07-20 123920.png
+│   │   ├── Screenshot 2025-07-20 124029.png
+│   │   └── Screenshot 2025-07-20 124113.png
+│   ├── Security Groups (Step 2)
+│   │   └── Screenshot 2025-07-17 235444.png
+│   ├── Training (Step 9)
+│   │   ├── Screenshot 2025-07-19 001423.png
+│   │   ├── Screenshot 2025-07-19 083017.png
+│   │   └── Screenshot 2025-07-19 091303.png
+│   ├── User uploads Data(Step 11)
+│   │   └── Screenshot 2025-07-20 115416.png
+│   └── Vpc Endpoints  (Step 3)
+│       └── Screenshot 2025-07-17 235428.png
+├── README.md
+├── data
+│   ├── eda_report.html
+│   ├── lead_scoring.csv
+│   └── test_lead_scoring.csv
+├── lead_data_schema.txt
+├── models
+│   ├── full_pipeline.pkl
+│   ├── full_pipeline_with_model.pkl
+│   └── preprocessor.pkl
+├── reports
+│   └── drift
+│       ├── drift_lead_data_vs_uploaded_20250717_052645.html
+│       ├── drift_lead_data_vs_uploaded_20250717_052645.json
+│       ├── drift_train_vs_test_20250716_080726.html
+│       ├── drift_train_vs_test_20250716_080726.json
+├── requirements.txt
+├── scripts
+│   ├── load_data_to_postgres.py
+│   └── run_drift.py
+├── src
+│   ├── airflow
+│   │   ├── airflow.cfg
+│   │   ├── airflow.db
+│   │   ├── dags
+│   │   │   ├── __pycache__
+│   │   │   │   └── drift_retrain_dag.cpython-310.pyc
+│   │   │   └── drift_retrain_dag.py
+│   │   ├── logs
+│   │   │   ├── dag_id=drift_and_retrain
+│   │   │   │   ├── run_id=manual__2025-07-16T17:55:44.183292+00:00
+│   │   │   │   │   └── task_id=wait_for_new_upload
+│   │   │   │   │       └── attempt=1.log
+│   │   ├── dag_processor_manager
+│   │   │   │   └── dag_processor_manager.log
+│   │   │   └── scheduler
+│   │   │       ├── 2025-07-16
+│   │   │       │   ├── drift_retrain_dag.py.log
+│   │   │       │   └── native_dags
+│   │   │       └── latest -> 2025-07-20
+│   │   ├── scripts
+│   │   │   ├── __pycache__
+│   │   │   │   ├── check_drift_runner.cpython-310.pyc
+│   │   │   │   ├── retrain_runner.cpython-310.pyc
+│   │   │   │   └── trigger_upload_monitor.cpython-310.pyc
+│   │   │   ├── check_drift_runner.py
+│   │   │   ├── retrain_runner.py
+│   │   │   └── trigger_upload_monitor.py
+│   │   ├── utils
+│   │   │   ├── __pycache__
+│   │   │   │   └── airflow_loader.cpython-310.pyc
+│   │   │   └── airflow_loader.py
+│   │   └── webserver_config.py
+│   ├── app
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-310.pyc
+│   │   │   └── routes.cpython-310.pyc
+│   │   ├── main.py
+│   │   ├── routes.py
+│   │   ├── templates
+│   │   │   ├── index.html
+│   │   │   └── lead_scoring_project.code-workspace
+│   │   └── utils
+│   │       ├── __pycache__
+│   │       │   ├── prediction.cpython-310.pyc
+│   │       │   └── upload.cpython-310.pyc
+│   │       ├── prediction.py
+│   │       └── upload.py
+│   ├── db
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-310.pyc
+│   │   │   └── db_utils.cpython-310.pyc
+│   │   └── db_utils.py
+│   ├── drift
+│   │   ├── __pycache__
+│   │   │   └── check_drift.cpython-310.pyc
+│   │   ├── check_drift.py
+│   │   └── test_dirft.py
+│   ├── eda
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-310.pyc
+│   │   │   └── profiler.cpython-310.pyc
+│   │   └── profiler.py
+│   ├── logs
+│   │   └── scheduler
+│   │       └── latest -> 2025-07-16
+│   └── ml
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   └── __init__.cpython-310.pyc
+│       ├── data_loader
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   ├── __init__.cpython-310.pyc
+│       │   │   └── data_loader.cpython-310.pyc
+│       │   └── data_loader.py
+│       ├── evaluation
+│       │   ├── __pycache__
+│       │   │   └── metrics.cpython-310.pyc
+│       │   ├── comparator.py
+│       │   └── metrics.py
+│       ├── model_objects
+│       │   ├── GradientBoosting_model.pkl
+│       │   ├── LightGBM_model.pkl
+│       │   ├── LogisticRegression_model.pkl
+│       │   ├── RandomForest_model.pkl
+│       │   ├── SVM_model.pkl
+│       │   └── XGBoost_model.pkl
+│       ├── pipeline
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   ├── __init__.cpython-310.pyc
+│       │   │   ├── custom_transformers.cpython-310.pyc
+│       │   │   ├── feature_engineering.cpython-310.pyc
+│       │   │   ├── feature_selection.cpython-310.pyc
+│       │   │   ├── feature_selector.cpython-310.pyc
+│       │   │   ├── pipeline_runner.cpython-310.pyc
+│       │   │   ├── preprocessing.cpython-310.pyc
+│       │   │   └── schema_validator.cpython-310.pyc
+│       │   ├── custom_transformers.py
+│       │   ├── feature_engineering.py
+│       │   ├── feature_selection.py
+│       │   ├── feature_selector.py
+│       │   ├── pipeline_runner.py
+│       │   ├── preprocessing.py
+│       │   └── schema_validator.py
+│       ├── registry
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   ├── __init__.cpython-310.pyc
+│       │   │   └── model_registry.cpython-310.pyc
+│       │   └── model_registry.py
+│       └── training
+│           ├── __init__.py
+│           ├── __pycache__
+│           │   ├── __init__.cpython-310.pyc
+│           │   ├── mlflow_logger.cpython-310.pyc
+│           │   ├── model_registry.cpython-310.pyc
+│           │   └── train_utils.cpython-310.pyc
+│           ├── mlflow_logger.py
+│           ├── train.py
+│           └── train_utils.py
+├── structure.txt
+├── struture.txt
+└── uploads
+    ├── Lead_Scoring.csv
+    ├── predicted_data.csv
+    ├── sample_data.csv
+    ├── test_Lead_Scoring.csv
+    └── uploaded_leads.csv

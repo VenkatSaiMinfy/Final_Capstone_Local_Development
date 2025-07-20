@@ -4,12 +4,34 @@ from flask import Flask
 import os
 
 def create_app():
-    app = Flask(__name__,
-                template_folder="templates",
-                static_folder="static")
+    """
+    Factory to create and configure the Flask application.
+    
+    - Sets up template and static folders.
+    - Loads SECRET_KEY from environment (falls back to 'dev-key').
+    - Registers the routes blueprint.
+    
+    Returns:
+        Flask app instance
+    """
+    # ─────────────────────────────────────────────
+    # Initialize Flask app with custom folders
+    # ─────────────────────────────────────────────
+    app = Flask(
+        __name__,
+        template_folder="templates",
+        static_folder="static"
+    )
+    
+    # ─────────────────────────────────────────────
+    # Configure secret key for session signing
+    # ─────────────────────────────────────────────
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-key")
-
-    # absolute import of routes blueprint
+    
+    # ─────────────────────────────────────────────
+    # Register routes blueprint from src/app/routes.py
+    # ─────────────────────────────────────────────
     from app.routes import bp as routes_bp
     app.register_blueprint(routes_bp)
+    
     return app

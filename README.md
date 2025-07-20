@@ -1,12 +1,123 @@
+``` text✅ Prerequisites
+WSL (Ubuntu) or native Ubuntu
+
+Conda environment (lead_scoring_system)
+
+Python 3.8
+
+src/airflow/ as your Airflow project directory
+
+📦 Step 1: Install PostgreSQL
+bash
+Copy code
+sudo apt update
 sudo apt install postgresql postgresql-contrib
-
-sudo -u postgres psql
-
+🛢️ Step 2: Setup PostgreSQL DB
+bash
+Copy code
+# Create a new database
 sudo -u postgres psql -c "CREATE DATABASE lead_scoring_db;"
 
+# Optionally log into the DB
 sudo -u postgres psql
+\l                             # List all databases
+\c lead_scoring_db            # Connect to the new DB
+select * from lead_data_uploaded limit 10;  # View data
+🐍 Step 3: Install Airflow 2.10.0 in Conda Environment
+Make sure your conda environment is activated:
 
-\l
+bash
+Copy code
+conda activate lead_scoring_system
+Install Airflow with constraints (for Python 3.8):
+
+bash
+Copy code
+pip install "apache-airflow==2.10.0" \
+  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.0/constraints-3.8.txt"
+🏠 Step 4: Set AIRFLOW_HOME in Shell Config
+Open your shell config file:
+
+bash
+Copy code
+nano ~/.bashrc         # For bash
+# or
+nano ~/.zshrc          # For zsh
+Add the following lines at the end:
+
+bash
+Copy code
+# Airflow project config
+export AIRFLOW_HOME=~/Final_Capstone_Project/lead_scoring_project/src/airflow
+conda activate lead_scoring_system
+Save and exit:
+
+Press Ctrl + O → Enter → Ctrl + X
+
+Reload your shell:
+
+bash
+Copy code
+source ~/.bashrc
+🔍 Step 5: Verify Setup
+bash
+Copy code
+echo $AIRFLOW_HOME
+# Expected: /home/venkat/Final_Capstone_Project/lead_scoring_project/src/airflow
+
+which airflow
+# Should point to something like: /home/venkat/miniconda3/envs/lead_scoring_system/bin/airflow
+(Optional) Remove default folder:
+
+bash
+Copy code
+rm -rf ~/airflow
+🛠️ Step 6: Initialize Airflow DB
+bash
+Copy code
+airflow db init
+👤 Step 7: Create Airflow Admin User
+bash
+Copy code
+airflow users create \
+    --username admin \
+    --firstname Venkat \
+    --lastname Sai \
+    --role Admin \
+    --email venkat@example.com
+🚀 Step 8: Start Airflow Services
+In two separate terminals:
+
+Terminal 1:
+
+bash
+Copy code
+airflow webserver --port 8080
+Terminal 2:
+
+bash
+Copy code
+airflow scheduler
+Open your browser at: http://localhost:8080
+
+📁 Output Structure (Post-Init)
+Your project src/airflow/ will now contain:
+
+bash
+Copy code
+src/airflow/
+├── airflow.cfg
+├── airflow.db
+├── logs/
+└── dags/
+✅ From Now On
+AIRFLOW_HOME is automatically set
+
+Your conda environment auto-activates
+
+All Airflow metadata/logs/configs are cleanly isolated in src/airflow
+
+```
 
 \c lead_scoring_db
 
