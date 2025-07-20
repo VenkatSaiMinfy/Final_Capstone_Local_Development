@@ -1,3 +1,99 @@
+# Structure of the Project 
+```text
+.                                                       # Root project directory
+├── Final_Outputs                                       # Screenshots of each step for documentation/evidence
+│   ├── AFTER DATA UPLOADED BY USER BACKEND( Step 12)   # Backend validation after user uploads data
+│   ├── Airflow (Step 13)                               # Airflow UI screenshots after DAG run
+│   ├── CRAWLER(Step 5)                                 # Screenshots of the web crawler setup
+│   ├── Dirft logs (Step 14)                            # Screenshots of drift report logs from Airflow
+│   ├── EC2 (MLFLOW) [STEP 8]                           # EC2 instance setup for MLflow
+│   ├── Final Flask Code (Step 13)                      # Flask backend UI and API screenshots
+│   ├── Glue connections (Step 6)                       # AWS Glue crawler and connection setup
+│   ├── IAM                                             # IAM roles and permissions
+│   ├── Inital S3 with Lead  Data(Step 1)               # Initial data upload to S3
+│   ├── MLflow (Step 10)                                # Screenshots of MLflow model tracking
+│   ├── REDSHIFT (Step 4)                               # Amazon Redshift setup and tables
+│   ├── S3 - REDSHIFT (Step 7)                          # S3 to Redshift connection proof
+│   ├── S3 Buckets Final State with all files(Step 15)  # Final structure of S3 with all files
+│   ├── Security Groups (Step 2)                        # Security Group configuration screenshots
+│   ├── Training (Step 9)                               # Model training pipeline run on EC2
+│   ├── User uploads Data(Step 11)                      # Frontend where user uploads CSV
+│   └── Vpc Endpoints  (Step 3)                         # VPC endpoints setup for private access
+├── README.md                                           # Project instructions and documentation
+├── data                                                # Local data used for EDA and modeling
+│   ├── eda_report.html                                 # Auto-generated EDA report
+│   ├── lead_scoring.csv                                # Raw training dataset
+│   └── test_lead_scoring.csv                           # Test dataset for validation
+├── lead_data_schema.txt                                # Schema of the incoming data file
+├── models                                              # Pickled models and preprocessing pipelines
+│   ├── full_pipeline.pkl                               # Pipeline with preprocessing steps
+│   ├── full_pipeline_with_model.pkl                    # Full pipeline including model
+│   └── preprocessor.pkl                                # Only preprocessing object
+├── reports
+│   └── drift                                           # Data drift reports (HTML + JSON)
+│       ├── drift_lead_data_vs_uploaded_*.html/json     # Drift between base data and uploaded
+│       └── drift_train_vs_test_*.html/json             # Drift between train and test data
+├── requirements.txt                                    # Python dependencies
+├── scripts                                             # Manual scripts to run specific jobs
+│   ├── load_data_to_postgres.py                        # Script to upload data to PostgreSQL
+│   └── run_drift.py                                    # Script to trigger drift calculation
+├── src                                                 # Main source code directory
+│   ├── airflow                                         # Airflow DAGs and metadata setup
+│   │   ├── airflow.cfg                                 # Configuration file for Airflow
+│   │   ├── airflow.db                                  # Metadata DB (SQLite)
+│   │   ├── dags                                        # All DAG files
+│   │   │   └── drift_retrain_dag.py                    # Main DAG for drift detection + retraining
+│   │   ├── logs                                        # Airflow log output
+│   │   ├── scripts                                     # Airflow DAG-triggered scripts
+│   │   │   ├── check_drift_runner.py                   # Checks data drift
+│   │   │   ├── retrain_runner.py                       # Triggers retraining process
+│   │   │   └── trigger_upload_monitor.py               # Monitors S3 uploads
+│   │   ├── utils
+│   │   │   └── airflow_loader.py                       # Loads DAG configurations and variables
+│   │   └── webserver_config.py                         # Config for Airflow webserver
+│   ├── app                                             # Flask app backend
+│   │   ├── main.py                                     # Main Flask entry point
+│   │   ├── routes.py                                   # API endpoints for user interaction
+│   │   ├── templates/index.html                        # Frontend upload interface
+│   │   └── utils
+│   │       ├── prediction.py                           # Code to make predictions
+│   │       └── upload.py                               # Validates and uploads user CSV
+│   ├── db                                              # Database connection helpers
+│   │   └── db_utils.py                                 # Helper to connect/query PostgreSQL
+│   ├── drift                                           # Drift detection logic
+│   │   ├── check_drift.py                              # Drift check between datasets
+│   │   └── test_dirft.py                               # Unit tests for drift module
+│   ├── eda                                             # Exploratory Data Analysis tools
+│   │   └── profiler.py                                 # Code for generating EDA reports
+│   ├── logs                                            # Custom logs
+│   └── ml                                              # Machine learning modules
+│       ├── data_loader/data_loader.py                 # Loads raw or preprocessed data
+│       ├── evaluation/                                 # Model evaluation and comparison
+│       │   └── metrics.py                              # Accuracy, precision, recall etc.
+│       ├── model_objects/                              # Saved models for comparison
+│       ├── pipeline/                                   # Pipeline construction
+│       │   ├── custom_transformers.py                  # Custom transformers used in pipeline
+│       │   ├── feature_engineering.py                  # Feature engineering logic
+│       │   ├── feature_selection.py                    # Feature selection strategies
+│       │   ├── feature_selector.py                     # Custom transformer to select features
+│       │   ├── pipeline_runner.py                      # Pipeline runner script
+│       │   ├── preprocessing.py                        # Preprocessing logic
+│       │   └── schema_validator.py                     # Validates incoming dataframe schema
+│       ├── registry/model_registry.py                  # Registers and loads models from disk
+│       └── training/                                   # Training logic
+│           ├── mlflow_logger.py                        # Logs metrics and models to MLflow
+│           ├── train.py                                # Runs the full model training pipeline
+│           └── train_utils.py                          # Utilities for training
+├── structure.txt                                       # Alternate structure file (likely unused)
+├── struture.txt                                        # Typo'd duplicate, likely can be removed
+└── uploads                                             # Uploaded CSVs from users
+    ├── Lead_Scoring.csv                                # Uploaded training data
+    ├── predicted_data.csv                              # Output file with model predictions
+    ├── sample_data.csv                                 # Sample format for uploads
+    └── test_Lead_Scoring.csv                           # Uploaded test data
+```
+
+
 # 🛫 Example Setup: Airflow with PostgreSQL for Lead Scoring System
 
 > ⚠️ **NOTE:** All names used here (e.g., database names, project folder paths, user details) are just examples.  
